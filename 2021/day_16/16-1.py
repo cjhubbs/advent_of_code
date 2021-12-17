@@ -26,6 +26,25 @@ def process_literal(bits):
   v = b2d(bin_string)
   return v,bits 
 
+def process_operation(ptype, operands):
+  if ptype == "000":
+    v = sum(operands)
+  elif ptype == "001":
+    v = 1
+    for i in operands:
+      v = v * i
+  elif ptype == "010":
+    v = min(operands)
+  elif ptype == "011":
+    v = max(operands)
+  elif ptype == "101":
+    v = operands[0] > operands[1]
+  elif ptype == "110":
+    v = operands[0] < operands[1]
+  elif ptype == "111":
+    v = operands[0] == operands[1]
+  return v 
+
 def process_packet(bits):
   
   version,bits = get_n_bits(3,bits)
@@ -36,14 +55,12 @@ def process_packet(bits):
   
   if ptype == "100":
     val,bits = process_literal(bits)
-    print("literal value is:", val)
     return val, bits
   else:
     #operator packet
     length_type,bits = get_n_bits(1,bits)
     subp_vals = []
     if length_type == "0":
-      print("operator packet, length type 0")
       len_string,bits = get_n_bits(15,bits)
       total_length_of_subpackets = b2d(len_string)
       subp,bits = get_n_bits(total_length_of_subpackets,bits)
@@ -51,38 +68,14 @@ def process_packet(bits):
         val, subp = process_packet(subp)
         subp_vals.append(val)      
     else:
-      print("operator packet, length type 1")
       num_string,bits = get_n_bits(11,bits)
       num_of_subpackets = b2d(num_string)
       for i in range(num_of_subpackets):
         val, bits = process_packet(bits)
         subp_vals.append(val)
     
-    if ptype == "000":
-      v = sum(subp_vals)
-    elif ptype == "001":
-      v = 1
-      for i in subp_vals:
-        v = v * i
-    elif ptype == "010":
-      v = min(subp_vals)
-    elif ptype == "011":
-      v = max(subp_vals)
-    elif ptype == "101":
-      if subp_vals[0] > subp_vals[1]:
-        v = 1
-      else:
-        v = 0
-    elif ptype == "110":
-      if subp_vals[0] < subp_vals[1]:
-        v = 1
-      else:
-        v = 0
-    elif ptype == "111":
-      if subp_vals[0] == subp_vals[1]:
-        v = 1
-      else:
-        v = 0
+  v = process_operation(ptype,subp_vals)
+    
   return v, bits
 
 f = open("input16.txt","r")
