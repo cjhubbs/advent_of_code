@@ -1,4 +1,4 @@
-import math
+import itertools
 
 def parse_line(l):
   tokens = []
@@ -8,7 +8,7 @@ def parse_line(l):
       tokens.append(char)
     elif char in "],":
       if temp:
-        tokens.append(temp)
+        tokens.append(int(temp))
         temp = ""
       tokens.append(char)
     elif char.isdigit():
@@ -30,7 +30,7 @@ def explode(n):
   depth_count = 0
   x = []
   for idx, token in enumerate(n):
-    if token.isdigit():
+    if isinstance(token, int):
       last_int_index = idx 
     elif token == "[":
       depth_count += 1
@@ -39,23 +39,23 @@ def explode(n):
     
     if depth_count == 5:
       #explode
-      left_num = int(n[idx+1])
-      right_num = int(n[idx+3])
+      left_num = n[idx+1]
+      right_num = n[idx+3]
       
       #add left number to digit to left
       if last_int_index > -1:
-        x[last_int_index] = str(int(x[last_int_index]) + left_num)
+        x[last_int_index] = x[last_int_index] + left_num
       
       #add right number to digit to right
       for temp_idx in range(idx+4,len(n)):
-        if n[temp_idx].isdigit():
-          n[temp_idx] = str(int(n[temp_idx]) + right_num)
+        if isinstance(n[temp_idx],int):
+          n[temp_idx] = n[temp_idx] + right_num
           break
       
       #add in a zero
-      x.append("0")
+      x.append(0)
       
-      #discard the open bracket, the two digits, the comma, and the close bracket
+      # skip the open bracket, the two ints, the comma, and the close bracket
       # append the rest of the string, only take one action at a time
       for temp_idx in range(idx+5,len(n)):
         x.append(n[temp_idx])
@@ -68,11 +68,10 @@ def explode(n):
 def split_num(n):
   x = []
   for idx, token in enumerate(n):
-    if token.isdigit():
-      int_t = int(token)
-      if int_t > 9:
-        left = str(int(math.floor(int_t / 2)))
-        right = str(int(math.ceil(int_t / 2)))
+    if isinstance(token,int):
+      if token > 9:
+        left = token // 2
+        right = (token + 1) // 2
         x.append("[")
         x.append(left)
         x.append(",")
@@ -101,11 +100,14 @@ def reduce_fully(n):
     new_n = reduce(cur_n)
   return new_n    
   
-def calc_magnitude(n):
+def magnitude(n):
+  
+  # stack the ints as you encounter them. When you hit a right bracket, 
+  # do the math on the last two ints and re-stack the result
   num_stack = []
   for token in n:
-    if token.isdigit():
-      num_stack.append(int(token))
+    if isinstance(token,int):
+      num_stack.append(token)
     if token == "]":
       r = num_stack.pop()
       l = num_stack.pop()
@@ -113,7 +115,6 @@ def calc_magnitude(n):
       num_stack.append(tmp)
   return num_stack[0]  
     
-
 f = open("input18.txt","r")
 
 numbers = []
@@ -124,18 +125,16 @@ p2n = numbers[:]
 
 n = numbers[0]  
 for next_num in range(1,len(numbers)):
-  n = add_numbers(n,numbers[next_num])
-  n = reduce_fully(n)    
+  n = reduce_fully(add_numbers(n,numbers[next_num]))
 
-print("p1 magnitude is", calc_magnitude(n))
+print("p1 magnitude is", magnitude(n))
 
 max = 0
+
 for i in range(len(p2n)):
   for j in range(len(p2n)):
     if i != j:
-      s = add_numbers(p2n[i],p2n[j])
-      s = reduce_fully(s)
-      mag = calc_magnitude(s)
+      mag = magnitude(reduce_fully(add_numbers(p2n[i],p2n[j])))
       if mag > max:
         max = mag 
 print("p2 max is",max)
