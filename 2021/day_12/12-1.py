@@ -1,6 +1,6 @@
+
 nodes = {}
 paths = {}
-
 
 def log_path(p):
   t = "".join(p) + ",end"
@@ -38,5 +38,6 @@ path = [ 'start' ]
 
 
 traverse(path)
-  
+
 print(len(paths.keys()))
+
