@@ -1,53 +1,64 @@
 import numpy as np
-from collections import namedtuple
-from heapq import heappop,heappush  
-import sys 
+import heapq 
 
-Node = namedtuple("Node", "x y")
-Path = namedtuple("Path", "cost node")
+def astar_solve(data, max_l):
+  start_node = (0,0)
+  end_node = (max_l -1, max_l - 1)
+  
+  open_queue = []
+  closed_queue = set()
+  parents = { }
+  g_score = {}
 
-ROWS = 0
-COLS = 0
+  for y in range(len(data)):
+    for x in range(len(data)):
+      g_score[(y,x)] = np.Inf
+      
+  g_score[start_node]= 0
+  heapq.heappush(open_queue,(get_cityblock(start_node,end_node),start_node))
+  
+  while open_queue:
+    _, node = heapq.heappop(open_queue)
+    if node == end_node:
+      total = 0
+      while node in parents:
+        x = node[0]
+        y = node[1]
+        total += data[y][x]
+        node = parents[node]
+      return total 
+    elif node in closed_queue:
+      continue
+    else:
+      neighbors = get_neighbors(data, node)
+      for n in neighbors:
+        if n in closed_queue:
+          continue
+        x = n[0]
+        y = n[1]
+        added_g_score = data[y][x]
+        candidate_g = g_score[node] + added_g_score
+        if candidate_g <= g_score[n]:
+          g_score[n] = candidate_g
+          parents[n] = node 
+          f = get_cityblock(n, end_node) + candidate_g
+          heapq.heappush(open_queue,(f,n))
+      closed_queue.add(node)
 
-def find_path(map, start, goal):
-  max_y = len(map) - 1
-  max_x = len(map[0]) - 1
-  
-  start_risk = map[start.y, start.x]
-  
-  not_visited:list[Path] = [Path(start_risk, start)]
-  visited:list[Node] = []
-  
-  while not_visited:
-    risk, node = heappop(not_visited)
-    if node == goal: return risk - start_risk
-    if node in visited: continue
-    x,y = node 
-    
-    choices = (x+1, y),(x-1,y),(x,y+1),(x,y-1)
-    for next_x, next_y in choices:
-      if (x <= next_x <= max_x) and (0 <= next_y <= max_y):
-        next_risk = risk + map[next_y][next_x]
-        next_node = Node(next_x, next_y)
-        heappush(not_visited, Path(next_risk, next_node))
-    visited += [node]
+def get_cityblock(a,b):
+  return abs(a[0] - b[0]) + abs(a[1] - b[1])
 
-def minCost(cost, m, n):
-  tc = [[0 for x in range(COLS*5)] for x in range(ROWS*5)]
-  
-  tc[0][0] = 0
-  for i in range(1,m+1):
-    tc[i][0] = tc[i-1][0] + cost[i][0]
-  
-  for j in range(1,n+1):
-    tc[0][j] = tc[0][j-1] + cost[0][j]
-  
-  for i in range(1, m+1):
-    for j in range(1,n+1):
-      tc[i][j] = min(tc[i-1][j],tc[i][j-1]) + cost[i][j]
-  return tc[m][n]
+def get_neighbors(data, node):
+  x = node[0]
+  y = node[1]
+  node_neighbors = []
+  neighbors = [(x+1,y),(x-1,y),(x,y+1),(x,y-1)]
+  for i in neighbors:
+    if (0 <= i[0] <= ROWS*5 - 1) and (0 <= i[1] <= ROWS*5 -1):
+      node_neighbors.append(i)
+  return node_neighbors
+          
 
-np.set_printoptions(threshold=sys.maxsize)
 f = open("input15.txt", "r")
 lines = f.read().splitlines()
 ROWS = len(lines)
@@ -77,6 +88,7 @@ for r in range(ROWS*4):
   grid[r+ROWS] = temp_row
 
 grid[0][0] = 0
-cost = find_path(grid,Node(0,0), Node(ROWS*5-1,COLS*5-1))
+
+cost = astar_solve(grid,ROWS*5)
 print ("cost is: ",cost)
-#print(minCost(grid,ROWS*5-1,COLS*5-1))
+
