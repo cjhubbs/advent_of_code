@@ -48,16 +48,25 @@ depth["COM"] = 0
 stack_traverse("COM")
 print("p1 orbits: ",orbits)
 
+#part 2
+
+#get paths too YOU and to SAN; easy when going from target back to root
 path1 = get_path_to("COM","YOU")
 path2 = get_path_to("COM","SAN")
+
+#reverse so you have root-to-target path
 path1.reverse()
 path2.reverse()
 distance = 0
-total_length = len(path1) + len(path2)
+
+#worst case is only common node is root, subtract 2 to eliminate target nodes
+total_length = len(path1) + len(path2) - 2
+
+#for every step from root that is common, subtract those nodes
 for i in range(min(len(path1),len(path2))):
   if path1[i] == path2[i]:
     total_length -= 2
   else:
     break
 
-print("p2 xfers required = ",total_length-2)
+print("p2 xfers required = ",total_length)
