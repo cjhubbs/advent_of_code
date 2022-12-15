@@ -5,7 +5,11 @@ class Sensor():
         self.pos = (x,y)
         self.nearest = (nearest_x, nearest_y)
         self.dist = abs(x-nearest_x) + abs(y-nearest_y)
+        print("Dist is:", self.dist)
     
+    def x_extents(self):
+        return [self.pos[0] - self.dist, self.pos[0] + self.dist]
+
     def y_extents(self):
         return [self.pos[1] - self.dist, self.pos[1] + self.dist]
 
@@ -22,6 +26,15 @@ class Sensor():
         for x in range(x_min, x_max + 1, 1):
             points.add(x)
         return points
+    
+    def get_outline(self):
+        points = []
+        for i in range(self.dist):
+            points.append((self.pos[0]+i,self.pos[1]+self.dist-i))
+            points.append((self.pos[0]+i,self.pos[1]-(self.dist-i)))
+            points.append((self.pos[0]-i,self.pos[1]+self.dist-i))
+            points.append((self.pos[0]-i,self.pos[1]-(self.dist-i)))
+        return points
 
 if __name__ == "__main__":
 
@@ -29,6 +42,7 @@ if __name__ == "__main__":
     beacons = set()
 
     with open('15-input.txt') as f:
+    #with open('15-input-test.txt') as f:
         lines = f.read().splitlines()
     f.close()
     for l in lines:
@@ -39,6 +53,7 @@ if __name__ == "__main__":
     #p1
     x_coverage_at_y = set()
     target_y = 2000000
+    #target_y = 20
     
     beacons_on_target_y = 0
     for b in beacons:
@@ -50,3 +65,17 @@ if __name__ == "__main__":
             x_coverage_at_y.update(s.x_cov_at_y(target_y))
 
     print(len(x_coverage_at_y) - beacons_on_target_y)
+
+    #p2
+    edges = { }
+    # for s in sensors:
+    #     points = s.get_outline()
+    #     for p in points:
+    #         if p in edges.keys():
+    #             edges[p] += 1
+    #         else:
+    #             edges[p] = 1
+    # #print(edges)
+    # for k,v in edges.items():
+    #     if v == 1:
+    #         print(k)
