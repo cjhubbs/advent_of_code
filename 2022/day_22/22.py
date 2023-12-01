@@ -17,26 +17,32 @@ class jungle():
 
         self.dir = new_dir[self.dir][turn_dir]
     
-    def move(self, dist):
+    def get_next_pos(self):
         steps = { "R": [0,1],
                   "L": [0,-1],
                   "U": [-1,0],
                   "D": [1,0] }
         step = steps[self.dir]
-        for i in range(dist):
-            new_row = (self.pos[0] + step[0]) % self.max_dim
-            new_col = (self.pos[1] + step[1]) % self.max_dim 
+
+        new_row = (self.pos[0] + step[0]) % self.max_dim
+        new_col = (self.pos[1] + step[1]) % self.max_dim 
+        if self.grid[new_row][new_col] == ".":
+            return [new_row, new_col]
+        elif self.grid[new_row][new_col] == "#":
+            return self.pos
+        else:
+            while self.grid[new_row][new_col] == " ":
+                new_row = (new_row + step[0]) % self.max_dim
+                new_col = (new_col + step[1]) % self.max_dim
             if self.grid[new_row][new_col] == ".":
-                self.pos = [new_row, new_col]
-            elif self.grid[new_row][new_col] == "#":
-                pass #pos doesn't change
+                return [new_row, new_col]
             else:
-                while self.grid[new_row][new_col] == " ":
-                    new_row = (new_row + step[0]) % self.max_dim
-                    new_col = (new_col + step[1]) % self.max_dim
-                if self.grid[new_row][new_col] == ".":
-                    self.pos = [new_row, new_col]
-    
+                return self.pos
+
+    def move(self, dist):
+        for i in range(dist):
+            self.pos = self.get_next_pos()
+
     def get_score(self):
         facing_points = { "R": 0, "D": 1, "L": 2, "U":3}
         return (1000*(self.pos[0]+1) + 4*(self.pos[1]+1) + facing_points[self.dir])
