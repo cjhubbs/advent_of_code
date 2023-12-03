@@ -5,7 +5,6 @@ class Sensor():
         self.pos = (x,y)
         self.nearest = (nearest_x, nearest_y)
         self.dist = abs(x-nearest_x) + abs(y-nearest_y)
-        print("Dist is:", self.dist)
     
     def x_extents(self):
         return [self.pos[0] - self.dist, self.pos[0] + self.dist]
@@ -27,13 +26,19 @@ class Sensor():
             points.add(x)
         return points
     
+    def covers_point(self,p):
+        p_dist = abs(p[0] - self.pos[0]) + abs(p[1] - self.pos[1])
+        return p_dist <= self.dist 
+
     def get_outline(self):
         points = []
         for i in range(self.dist):
-            points.append((self.pos[0]+i,self.pos[1]+self.dist-i))
-            points.append((self.pos[0]+i,self.pos[1]-(self.dist-i)))
-            points.append((self.pos[0]-i,self.pos[1]+self.dist-i))
-            points.append((self.pos[0]-i,self.pos[1]-(self.dist-i)))
+            dx = i
+            dy = self.dist-i+1
+            points.append((self.pos[0]+dx, self.pos[1]+dy))
+            points.append((self.pos[0]+dx, self.pos[1]-dy))
+            points.append((self.pos[0]-dx, self.pos[1]+dy))
+            points.append((self.pos[0]-dx, self.pos[1]-dy))
         return points
 
 if __name__ == "__main__":
@@ -68,14 +73,22 @@ if __name__ == "__main__":
 
     #p2
     edges = { }
-    # for s in sensors:
-    #     points = s.get_outline()
-    #     for p in points:
-    #         if p in edges.keys():
-    #             edges[p] += 1
-    #         else:
-    #             edges[p] = 1
-    # #print(edges)
-    # for k,v in edges.items():
-    #     if v == 1:
-    #         print(k)
+    for s in sensors:
+        points = s.get_outline()
+        for p in points:
+            if p not in beacons:
+                if p in edges.keys():
+                    edges[p] += 1
+                else:
+                    edges[p] = 1
+    for k,v in edges.items():
+        if k[0] in range(target_y + 1) and k[1] in range(target_y + 1):
+            covered = False
+            for s in sensors:
+                if s.covers_point(k):
+                    covered = True
+                    break
+            if not covered:
+                print("Uncovered point: ", k)
+                print("freq = ", str(k[0]*4000000 + k[1]))
+        
