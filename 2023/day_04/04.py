@@ -16,9 +16,7 @@ for l in lines:
     num_of_winners = 0
     card_num, winners, tries = parse_line(l)
     card_counts[card_num] += 1
-    for t in tries:
-        if t in winners:
-            num_of_winners += 1
+    num_of_winners = sum([1 for t in tries if t in winners])
     if num_of_winners > 0:
         total_score += 2**(num_of_winners-1)
         for n in range(num_of_winners):
