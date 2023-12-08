@@ -39,12 +39,8 @@ if __name__ == "__main__":
             if starts[j][2] == "Z":
                 if not j in hits:
                     hits[j] = step_counter
-        #test_digit = 2
-        #if starts[test_digit][2] == "Z":
-        #    print("start[" + str(test_digit) + "] = " + starts[test_digit] + " at step " + str(step_counter))
         i = (i+1) % len(steps)
         if len(hits) == len(starts):
             break 
-    print(hits)
     print('p2 steps: ',lcm(hits[0],hits[1],hits[2],hits[3],hits[4],hits[5]))
     
