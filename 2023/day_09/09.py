@@ -8,14 +8,10 @@ def process_line(l):
        for k in range(len(n[tier-1])-1):
           n[tier].append(n[tier-1][k+1] - n[tier-1][k])
     
-    #p1
     for k in reversed(range(len(n)-1)):
        n[k].append(n[k][-1] + n[k+1][-1])
-    p1_result = n[0][-1]
-    
-    #p2
-    for k in reversed(range(len(n)-1)):
        n[k].insert(0,n[k][0] - n[k+1][0])
+    p1_result = n[0][-1]
     p2_result = n[0][0]
     
     return p1_result, p2_result
