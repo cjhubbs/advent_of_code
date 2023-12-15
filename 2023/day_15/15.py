@@ -2,10 +2,8 @@ boxes = [dict() for x in range(256)]
 
 def hash_line(l):
     h = 0
-    for char in l:
-        h += ord(char)
-        h *= 17
-        h = h % 256
+    for c in l:
+        h = ((h + ord(c))*17)%256
     return h
 
 if __name__ == "__main__":
