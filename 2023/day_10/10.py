@@ -28,6 +28,7 @@ offsets = {
 }
 
 dirs = 'NSEW'
+points = []
 
 if __name__ == "__main__":
     with open('10-input.txt') as f:
@@ -51,6 +52,7 @@ if __name__ == "__main__":
             cur = possible_pos
             step_counter += 1
             break 
+    points.append(cur)
 
     while True:
         possible_offsets = offsets[lines[cur[0]][cur[1]]]
@@ -60,7 +62,28 @@ if __name__ == "__main__":
         else:
             prev = cur 
             cur = np.add(cur, possible_offsets[0])
-        step_counter += 1            
+        step_counter += 1     
+        points.append(cur)
+       
         if np.array_equal(cur,start) and prev[0] != -1:
             break
     print(step_counter / 2)
+
+    print(len(points))
+    # Shoelace formula
+    # A = 1/2 * sum(xi * yi+1 - yi * xi+1)
+
+    # Pick's theorem
+    # A = i + points/2 - 1    i - interior points
+    # i = A - points/2 + 1
+
+    sumOfPoints = 0
+    howManyPoints = len(points)
+
+    for i in range(howManyPoints):
+        nextIndex = (i+1) % howManyPoints
+        sumOfPoints += points[i][1] * points[nextIndex][0] - points[i][0] * points[nextIndex][1]
+
+    result = round((sumOfPoints/2) - howManyPoints/2 + 1)
+
+    print(result)
