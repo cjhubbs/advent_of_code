@@ -13,6 +13,15 @@ class Rule():
         else:
             self.target = s
     
+    def constraint(self):
+        if self.has_condition:
+            return self.param + self.operator + str(self.threshold) + ":" + self.target
+        else:
+            return self.target
+    
+    def is_terminal(self):
+        return self.target in ['R','A']
+
     def process(self, part):
         if not self.has_condition:
             return True, self.target 
@@ -58,8 +67,21 @@ def process_workflow(workflows, part):
     else:
         return 0
 
+def assemble_paths(workflows,path,tag):
+    node = workflows[tag]
+    for rule in node:
+        path.append(rule.constraint())
+        if rule.is_terminal():
+            if rule.target == "A":
+                print("found A", path)
+            path.pop()
+        else:
+            assemble_paths(workflows, path, rule.target)
+    #path.pop()
+    return
+
 if __name__ == "__main__":
-    with open('19-input.txt') as f:
+    with open('19-test.txt') as f:
         lines = f.read().splitlines()
     workflows = {}
     parts = []
@@ -75,3 +97,4 @@ if __name__ == "__main__":
                 p1_sum += process_workflow(workflows, p)
 
     print(p1_sum)
+    assemble_paths(workflows,[],'in')
