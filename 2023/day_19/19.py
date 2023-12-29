@@ -77,7 +77,7 @@ def assemble_paths(workflows,path,tag):
             path.pop()
         else:
             assemble_paths(workflows, path, rule.target)
-    #path.pop()
+            path.pop()
     return
 
 if __name__ == "__main__":
