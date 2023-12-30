@@ -7,8 +7,6 @@ f = open("input5.txt", "r")
 for x in f:
   reset_mem = list(map(int, x.split(",")))
 
-#reset_mem = [3,0,4,0,99]
-
 mem = reset_mem[:]
 pc = 0
 

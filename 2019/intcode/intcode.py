@@ -21,72 +21,70 @@ class IntcodeComputer():
         self.input.append(val)  
     def get_input(self):
         return self.input.pop(0)
+    def get_val(self,arg,mode):
+        if mode == 0:
+            return self.mem[arg]
+        elif mode == 1:
+            return arg
+        elif mode == 2:
+            return self.mem[self.mem[arg] + self.relative_base]
+        else:
+            print('invalid mode in get_val')
+    def write(self,addr,val):
+        self.mem[addr] = val 
     def exec(self):
         retval = 0
         while self.mem[self.pc] != 99:
-            p = [-1,-1,-1,-1]
+            arg = [self.mem[self.pc],self.mem.get(self.pc+1),self.mem.get(self.pc+2),self.mem.get(self.pc+3)]
             if self.mem[self.pc] > 9:
                 memstr = zero_pad_left(self.mem[self.pc]) 
                 op = int(memstr[-2:])
-                mode = [0,memstr[2],memstr[1],memstr[0]]
-                
-                for i in range(1,self.num_of_params[op]):
-                    if mode[i] == "0":
-                        p[i] = self.mem[self.mem[self.pc+i]]
-                    elif mode[i] == "1":
-                        p[i] = self.mem[self.pc+i]
-                    elif mode[i] == "2":
-                        p[i] = self.mem[self.mem[self.pc+i] + self.relative_base]
-                    else:
-                        print("error in memory addressing")
-                p[3] = self.mem[self.pc+3]
-                if mode[3] == "2":
-                    p[3] += self.relative_base
+                mode = [0,int(memstr[2]),int(memstr[1]),int(memstr[0])]
             else:
                 op = self.mem[self.pc]
-                p[1] = self.mem[self.mem[self.pc+1]]
-                if self.num_of_params[op] > 1:
-                    p[2] = self.mem[self.mem[self.pc+2]]
-                if self.num_of_params[op] > 2:
-                    p[3] = self.mem[self.pc+3] 
+                mode = [0,0,0,0]
+
             if op == 1:
-                self.mem[p[3]] = p[1]+p[2]
+                p1 = self.get_val(arg[1],mode[1])
+                p2 = self.get_val(arg[2],mode[2])
+                self.write(arg[3],p1+p2)
                 self.pc += 4
             elif op == 2:
-                self.mem[p[3]] = p[1]*p[2]
+                p1 = self.get_val(arg[1],mode[1])
+                p2 = self.get_val(arg[2],mode[2])
+                self.write(arg[3],p1*p2)
                 self.pc += 4
             elif op == 3:
-                self.mem[self.mem[self.pc+1]] = self.get_input()
+                self.write(arg[1],self.get_input())
                 self.pc += 2
             elif op == 4:
-                #print("op4 output = ",p1)
+                retval = self.get_val(arg[1],mode[1])
                 self.pc += 2
-                retval = p[1]
-                return retval, False
+                print("op4: ",retval)
             elif op == 5:
-                if p[1] != 0:
-                    self.pc =  p[2]
+                if self.get_val(arg[1],mode[1]) != 0:
+                    self.pc = self.get_val(arg[2],mode[2])
                 else:
                     self.pc += 3
             elif op == 6:
-                if p[1] == 0:
-                    self.pc = p[2]
+                if self.get_val(arg[1],mode[1]) == 0:
+                    self.pc = self.get_val(arg[2],mode[2])
                 else:
                     self.pc += 3
             elif op == 7:
-                if p[1] < p[2]:
-                    self.mem[p[3]] = 1
+                if self.get_val(arg[1],mode[1]) < self.get_val(arg[2],mode[2]):
+                    self.write(arg[3],1)
                 else:
-                    self.mem[p[3]] = 0
+                    self.write(arg[3],0)
                 self.pc += 4
             elif op == 8:
-                if p[1] == p[2]:
-                    self.mem[p[3]] = 1
+                if self.get_val(arg[1],mode[1]) == self.get_val(arg[2],mode[2]):
+                    self.write(arg[3],1)
                 else:
-                    self.mem[p[3]] = 0
+                    self.write(arg[3],0)
                 self.pc += 4
             elif op == 9:
-                self.relative_base += p[1]
+                self.relative_base += arg[1]
                 self.pc += 2
         return retval, True
 
