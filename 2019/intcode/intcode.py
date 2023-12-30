@@ -5,7 +5,7 @@ def zero_pad_left(i):
   return s
 
 class IntcodeComputer():
-    def __init__(self, program):
+    def __init__(self, program,amp_mode = False):
         #self.mem = program 
         self.mem = {}
         counter = 0
@@ -16,6 +16,7 @@ class IntcodeComputer():
         self.relative_base = 0
         self.input = []
         self.num_of_params = [-1,3,3,1,1,2,2,3,3,1]
+        self.amp_mode = amp_mode
 
     def set_input(self,val):
         self.input.append(val)  
@@ -61,6 +62,8 @@ class IntcodeComputer():
                 retval = self.get_val(arg[1],mode[1])
                 self.pc += 2
                 print("op4: ",retval)
+                if self.amp_mode:
+                    return retval, False
             elif op == 5:
                 if self.get_val(arg[1],mode[1]) != 0:
                     self.pc = self.get_val(arg[2],mode[2])

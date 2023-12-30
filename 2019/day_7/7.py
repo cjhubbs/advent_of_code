@@ -32,7 +32,7 @@ for inp in possible_inputs:
     num_of_amps = 5
     amplifiers = []
     for i in range(num_of_amps):
-        amplifiers.append(intcode.IntcodeComputer(reset_mem[:]))
+        amplifiers.append(intcode.IntcodeComputer(reset_mem[:], True))
     inputs = inp
     input2 = 0
 
