@@ -24,15 +24,29 @@ class IntcodeComputer():
         return self.input.pop(0)
     def get_val(self,arg,mode):
         if mode == 0:
-            return self.mem[arg]
+            if arg in self.mem:
+                return self.mem[arg]
+            else:
+                self.mem[arg] = 0
+                return 0
         elif mode == 1:
             return arg
         elif mode == 2:
-            return self.mem[self.mem[arg] + self.relative_base]
+            key = arg + self.relative_base
+            if key in self.mem:
+                return self.mem[key]
+            else:
+                self.mem[key] = 0
+                return 0
         else:
             print('invalid mode in get_val')
-    def write(self,addr,val):
-        self.mem[addr] = val 
+    def write(self,addr,mode, val):
+        if mode == 0:
+            self.mem[addr] = val 
+        elif mode == 2:
+            self.mem[addr + self.relative_base] = val
+        else:
+            print("error during write")
     def exec(self):
         retval = 0
         while self.mem[self.pc] != 99:
@@ -48,15 +62,15 @@ class IntcodeComputer():
             if op == 1:
                 p1 = self.get_val(arg[1],mode[1])
                 p2 = self.get_val(arg[2],mode[2])
-                self.write(arg[3],p1+p2)
+                self.write(arg[3],mode[3],p1+p2)
                 self.pc += 4
             elif op == 2:
                 p1 = self.get_val(arg[1],mode[1])
                 p2 = self.get_val(arg[2],mode[2])
-                self.write(arg[3],p1*p2)
+                self.write(arg[3],mode[3],p1*p2)
                 self.pc += 4
             elif op == 3:
-                self.write(arg[1],self.get_input())
+                self.write(arg[1],mode[1],self.get_input())
                 self.pc += 2
             elif op == 4:
                 retval = self.get_val(arg[1],mode[1])
@@ -76,18 +90,18 @@ class IntcodeComputer():
                     self.pc += 3
             elif op == 7:
                 if self.get_val(arg[1],mode[1]) < self.get_val(arg[2],mode[2]):
-                    self.write(arg[3],1)
+                    self.write(arg[3],mode[3],1)
                 else:
-                    self.write(arg[3],0)
+                    self.write(arg[3],mode[3],0)
                 self.pc += 4
             elif op == 8:
                 if self.get_val(arg[1],mode[1]) == self.get_val(arg[2],mode[2]):
-                    self.write(arg[3],1)
+                    self.write(arg[3],mode[3],1)
                 else:
-                    self.write(arg[3],0)
+                    self.write(arg[3],mode[3],0)
                 self.pc += 4
             elif op == 9:
-                self.relative_base += arg[1]
+                self.relative_base += self.get_val(arg[1],mode[1])
                 self.pc += 2
         return retval, True
 
