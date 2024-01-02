@@ -28,3 +28,35 @@ while not commanded_exit:
         tiles[str(pos)] = 0
 
 print("total painted tiles: ",len(tiles))
+
+computer = intcode.IntcodeComputer(reset_mem[:],True)
+tiles = {}
+pos = [0,0]
+tiles[str(pos)] = 1
+dir = "N"
+
+commanded_exit = False
+while not commanded_exit:
+    computer.set_input(tiles[str(pos)])
+    tiles[str(pos)], commanded_exit = computer.exec()
+    dir_command, commanded_exit = computer.exec()
+    dir = next_dir[dir][dir_command]
+    pos = [pos[0] + increment[dir][0], pos[1] + increment[dir][1]]
+    if not str(pos) in tiles:
+        tiles[str(pos)] = 0
+
+lines = []
+for r in range(7):
+    temp = ""
+    for c in range(43):
+        key = [c,-r]
+        if str(key) in tiles:
+          if tiles[str(key)]:
+            temp += "\u2588"
+          else:
+            temp += " "
+        else:
+           temp += " "
+    lines.append(temp)
+for l in lines:
+  print(l)
