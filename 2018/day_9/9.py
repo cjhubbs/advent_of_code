@@ -14,7 +14,6 @@ def next_index(cur, circle):
 
 def play_game(num_players, last_marble):
     circle = deque([0])
-    cur = 0
     scores = [0] * num_players
     cur_player = 1
     for i in range(1,last_marble+1):
