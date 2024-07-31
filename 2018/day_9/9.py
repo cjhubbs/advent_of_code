@@ -1,17 +1,5 @@
 from collections import deque
 
-def next_index(cur, circle):
-    length = len(circle)
-    if length < 3:
-        return 1
-    else:
-        tgt = cur + 2
-        if tgt <= length:
-            return tgt 
-        else:
-            return 1
-
-
 def play_game(num_players, last_marble):
     circle = deque([0])
     scores = [0] * num_players
