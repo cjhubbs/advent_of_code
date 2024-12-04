@@ -42,7 +42,6 @@ def check_x(r,c,lines):
     
 if __name__ == "__main__":
 
-    #p1
     filename = "04-input.txt"
     with open(filename) as f:
         lines = f.read().splitlines()
