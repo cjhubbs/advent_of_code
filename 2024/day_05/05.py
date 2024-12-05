@@ -18,7 +18,17 @@ def score(pages):
 
 def repair(pages):
     temp = pages 
-    
+    i = 0
+    while i < len(temp):
+        if temp[i] in rules.keys():
+            for j in range(i+1,len(temp)):
+                if temp[j] in rules[temp[i]]:
+                    temp_char = temp.pop(i)
+                    temp.insert(j,temp_char)
+                    i = -1
+                    break
+        i += 1
+
     return temp
 
 if __name__ == "__main__":
@@ -32,6 +42,7 @@ if __name__ == "__main__":
     p2_total = 0
 
     #p1
+    count = 1
     for l in lines:
         if "|" in l:
             before, after = l.split("|")
@@ -44,10 +55,12 @@ if __name__ == "__main__":
             pages = l.split(",")
             if check(pages):
                 p1_total += score(pages)
+                print(f"{count}: valid")
             else:
                 #p2
                 temp = repair(pages)
                 p2_total += score(temp)
-
+                print(f"{count}: fixed")
+            count += 1
     print(p1_total)
     print(p2_total)
