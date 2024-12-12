@@ -16,22 +16,19 @@ def blink(rocks):
     new_rocks = {}
     for key,count in rocks.items():
         if key == "0":
-            if "1" in new_rocks.keys():
-                new_rocks["1"] += count
-            else:
-                new_rocks["1"] = count 
+            if not "1" in new_rocks.keys():
+                new_rocks["1"] = 0
+            new_rocks["1"] += count
         elif len(key) % 2 == 0:
             half_len = int(len(key)/2)
             first_half = key[:half_len]
             second_half = left_trim(key[(half_len):])
-            if first_half in new_rocks.keys():
-                new_rocks[first_half] += count 
-            else:
-                new_rocks[first_half] = count 
-            if second_half in new_rocks.keys():
-                new_rocks[second_half] += count
-            else:
-                new_rocks[second_half] = count 
+            if not first_half in new_rocks.keys():
+                new_rocks[first_half] = 0
+            new_rocks[first_half] += count 
+            if not second_half in new_rocks.keys():
+                new_rocks[second_half] = 0
+            new_rocks[second_half] += count
         else:
             temp = str(int(key)*2024)
             new_rocks[temp] = count 
