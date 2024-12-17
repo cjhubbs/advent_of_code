@@ -34,6 +34,31 @@ def calc_checksum(m):
         checksum += (i*val)
     return checksum
 
+def calc_block_checksum(blocks):
+    checksum = 0
+    for idx,data in blocks.items():
+        for i in range(data[1]):
+            checksum += ((idx+i)*data[0])
+    return checksum
+
+def calc_blocks(s):
+    s = s + "0"
+    idx = 0
+    blocks = {}
+    blanks = {}
+    id = 0
+    while len(s) > 0:
+        data = int(s[0])
+        empty = int(s[1])
+        s = s[2:]
+        blocks[idx] = [id,data]
+        idx += data 
+        blanks[idx] = empty 
+        idx += empty
+        id += 1
+    return blocks, blanks
+
+
 if __name__ == "__main__":
     filename = "09-input.txt"
     with open(filename) as f:
@@ -41,7 +66,28 @@ if __name__ == "__main__":
     f.close()
 
     old_map = create_map(lines[0])
-    #print(old_map)
+    old = old_map.copy()
     new_map = condense(old_map)
-    #print(new_map)
+
+    #p1
     print(calc_checksum(new_map))
+
+    blocks, blanks = calc_blocks(lines[0])
+    print(blocks)
+    print(blanks)
+    new_blocks = blocks.copy()
+
+    for block_idx,block_len in reversed(blocks.items()):
+        for gap_idx,gap_len in blanks.items():
+            if gap_len >= block_len[1]:
+                new_blocks[gap_idx] = block_len 
+                del blanks[gap_idx]
+                del new_blocks[block_idx]
+                if gap_len > block_len[1]:
+                    blanks[gap_idx + block_len[1]] = (gap_len - block_len[1])
+                break 
+        blanks = dict(sorted(blanks.items()))
+
+    new_blocks = dict(sorted(new_blocks.items()))
+    #print(new_blocks)
+    print(calc_block_checksum(new_blocks))
