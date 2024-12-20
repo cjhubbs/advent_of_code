@@ -1,6 +1,4 @@
 import itertools
-import operator 
-
 
 def do_calc(operands, operators):
     temp = operands[0]
@@ -44,6 +42,5 @@ if __name__ == "__main__":
                 p2_calibration_result += target
                 break
 
-    #p1
     print(p1_calibration_result)
     print(p2_calibration_result)
