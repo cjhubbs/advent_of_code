@@ -1,19 +1,34 @@
 from itertools import combinations 
 from operator import add, sub
 
-def calc_possible_nodes(p):
-    dist = (list( map(sub, p[1], p[0]) ))
-    nodes = []
-    nodes.append(list(map(sub,p[0],dist)))
-    nodes.append(list(map(add,p[1],dist)))
-    return nodes
-
 def node_in_range(n):
     return 0 <= n[0] < max_rows and 0 <= n[1] < max_cols
 
+def calc_possible_nodes(p, limit):
+    dist = (list( map(sub, p[1], p[0]) ))
+    nodes = [p[1],p[0]]
+    temp = p[0]
+    count = 0
+    while node_in_range(list(map(sub,temp,dist))):
+        if limit and (count == 1): 
+            break
+        nodes.append(temp)
+        temp = list(map(sub,temp,dist))
+        count += 1
+    temp = p[1]
+    count = 0
+    while node_in_range(list(map(add,temp,dist))):
+        if limit and (count == 1): 
+            break
+        nodes.append(list(map(add,temp,dist)))
+        temp = list(map(add,temp,dist))
+        count += 1
+    return nodes
+
+
 if __name__ == "__main__":
 
-    filename = "08-input.txt"
+    filename = "08-test2.txt"
 
     with open(filename) as f:
         lines = f.read().splitlines()
@@ -33,9 +48,8 @@ if __name__ == "__main__":
     
     for a in ant.values():
         for pair in combinations(a,2):
-            n = calc_possible_nodes(pair)
+            n = calc_possible_nodes(pair,False)
             print(n)
             for node in n:
-                if node_in_range(node):
-                    antinodes[','.join(str(node))] = 1
+                antinodes[','.join(str(node))] = 1
     print(len(antinodes))
